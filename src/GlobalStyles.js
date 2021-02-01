@@ -17,6 +17,18 @@ export const GlobalStyles = createGlobalStyle`
         box-sizing: border-box;
     }
 
+    ::-webkit-scrollbar{
+        width:4px;
+        background-color:var(--darkGray);
+    }
+    ::-webkit-scrollbar-track{
+        background-color: var(--darkGray);
+    }
+    ::-webkit-scrollbar-thumb{
+        border-radius:2px;
+        background-color: var(--light);
+    }
+
     body{
         font-family: sans-serif;
         color:var(--light);
@@ -61,6 +73,14 @@ export const GlobalStyles = createGlobalStyle`
         :active{
             transform: scale(0.95);
         }
+    }
+    textarea{
+        font-size: 10px;
+        padding: 5px;
+        font-weight: bold;
+
+        resize:none;
+
     }
 
 `;

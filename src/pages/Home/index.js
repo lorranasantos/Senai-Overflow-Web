@@ -1,14 +1,17 @@
 import {
   Container,
   Header,
+  Logo,
   Content,
   ProfileContainer,
   FeedContainer,
   ActionContainer,
   QuestionCard,
-} from "./style";
+  IconSignOut,
+} from "./styles";
 
 import imgProfile from "../../assets/foto_perfil.png";
+import logo from "../../assets/logo.png";
 
 function Profile() {
   return (
@@ -37,30 +40,79 @@ function Home() {
   return (
     <Container>
       <Header>
-        <Content>
-          <ProfileContainer>
-            <Profile />
-          </ProfileContainer>
-          <FeedContainer>
-            <QuestionCard>
-              <header>
-                <img src={imgProfile} />
-                <strong>por Alcino cino</strong>
-                <p>Em 12/12/2012 às 12:12</p>
-              </header>
-              <section>
-                <strong>Título</strong>
-                <p>Descrição</p>
-                <img src="https://www.google.com/search?q=reactjs&safe=strict&rlz=1C1SQJL_pt-BRBR927BR927&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjZ4pTU9cHuAhW6HrkGHSWzCyIQ_AUoAXoECBUQAw&biw=967&bih=927#imgrc=43LG89qCxGo6aM" />
-              </section>
-              <footer></footer>
-            </QuestionCard>
-          </FeedContainer>
-          <ActionContainer>
-            <button>Fazer uma Pergunta</button>
-          </ActionContainer>
-        </Content>
+        <Logo src={logo} />
+        <IconSignOut />
       </Header>
+      <Content>
+        <ProfileContainer>
+          <Profile />
+        </ProfileContainer>
+        <FeedContainer>
+          <QuestionCard>
+            <header>
+              <img src={imgProfile} />
+              <strong>por Alcino cino</strong>
+              <p>Em 12/12/2012 às 12:12</p>
+            </header>
+            <section>
+              <strong>Título</strong>
+              <p>Descrição</p>
+              <img src="https://cdn.auth0.com/blog/illustrations/reactjs.png" />
+            </section>
+            <footer>
+              <h1>11 Respostas</h1>
+              <section>
+                <header>
+                  <img src={imgProfile} />
+                  <strong>por Fulano</strong>
+                  <p>12/12/2012 às 12:13</p>
+                </header>
+                <p>Resposta para a pergunta</p>
+              </section>
+              <form>
+                <textarea
+                  placeholder="Responda essa dúvida"
+                  required
+                ></textarea>
+                <button>Enviar</button>
+              </form>
+            </footer>
+          </QuestionCard>
+          <QuestionCard>
+            <header>
+              <img src={imgProfile} />
+              <strong>por Alcino cino</strong>
+              <p>Em 12/12/2012 às 12:12</p>
+            </header>
+            <section>
+              <strong>Título</strong>
+              <p>Descrição</p>
+              <img src="https://cdn.auth0.com/blog/illustrations/reactjs.png" />
+            </section>
+            <footer>
+              <h1>11 Respostas</h1>
+              <section>
+                <header>
+                  <img src={imgProfile} />
+                  <strong>por Fulano</strong>
+                  <p>12/12/2012 às 12:13</p>
+                </header>
+                <p>Resposta para a pergunta</p>
+              </section>
+              <form>
+                <textarea
+                  placeholder="Responda essa dúvida"
+                  required
+                ></textarea>
+                <button>Enviar</button>
+              </form>
+            </footer>
+          </QuestionCard>
+        </FeedContainer>
+        <ActionContainer>
+          <button>Fazer uma Pergunta</button>
+        </ActionContainer>
+      </Content>
     </Container>
   );
 }

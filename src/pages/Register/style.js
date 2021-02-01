@@ -49,14 +49,16 @@ export const FormLogin = styled.form`
   min-width: 300px;
   max-width: 500px;
 
+  background-color: #282a36cc;
+  border-radius: 4px;
+  text-align: center;
+
+  box-shadow: 0px 0px 10px black;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-
-  background-color: #282a36cc;
-  border-radius: 4px;
-  box-shadow: 0px 0px 10px black;
 `;
 
 export const Header = styled.header`

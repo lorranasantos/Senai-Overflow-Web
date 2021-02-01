@@ -1,6 +1,4 @@
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Router from "./router";
 
 import { GlobalStyles } from "./GlobalStyles";
 
@@ -8,7 +6,7 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      <Home />
+      <Router />
     </>
   );
 }

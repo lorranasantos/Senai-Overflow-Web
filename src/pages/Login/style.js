@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+
 import bgImg from "../../assets/bg.jpg";
 
 export const Container = styled.div`
@@ -32,7 +33,7 @@ export const Container = styled.div`
 const loginAnimation = keyframes`
   0%{
     top: -250px;
-    opacity:0;
+    opacity: 0;
     transform: scale(0.01) rotate(90deg);
   }
   100%{
@@ -49,20 +50,22 @@ export const FormLogin = styled.form`
   min-width: 300px;
   max-width: 500px;
 
+  background-color: #282a36cc;
+  border-radius: 4px;
+  text-align: center;
+
+  box-shadow: 0px 0px 10px black;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-
-  background-color: #282a36cc;
-  border-radius: 4px;
-  box-shadow: 0px 0px 10px black;
+  overflow: hidden;
 `;
 
 export const Header = styled.header`
   width: 100%;
   padding: 20px;
-  border-radius: 4px 4px 0px, 0px;
+  border-radius: 4px 4px 0px 0px;
 
   background-color: var(--dark);
   box-shadow: 0px 2px 4px black;
@@ -76,8 +79,6 @@ export const Header = styled.header`
   > h2 {
     font-size: 18px;
     text-align: center;
-
-    background-color: red;
   }
 `;
 
