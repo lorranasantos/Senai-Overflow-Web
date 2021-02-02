@@ -1,12 +1,12 @@
-import { Container, FormLogin, Header, Body, Button } from "./style";
+import { Container, FormRegister, Header, Body, Button } from "./style";
 import Input from "../../components/input";
 import { Link, useHistory } from "react-router-dom";
 import { useState } from "react";
+import api from "../../services/api";
 
-function Login() {
+function Register() {
   const history = useHistory();
-
-  const [login, setLogin] = useState({
+  const [student, setStudent] = useState({
     ra: "",
     nome: "",
     email: "",
@@ -14,25 +14,47 @@ function Login() {
     validPassword: "",
   });
 
+  const handleInput = (e) => {
+    setStudent({ ...student, [e.target.id]: e.target.value });
+  };
+
+  const validPassword = () => {
+    return student.password === student.validPassword;
+  };
+
+  const buttonDisabled = () => {
+    const { ra, name, email, password } = student;
+
+    if (!ra || !name || !email || !password || !validPassword()) return true;
+
+    return false;
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefalt();
+
+    if (!validPassword()) return alert("As senhas precisam ser iguais");
 
     try {
-      const response = await api.post("/sessions", login);
-      console.log(response.data);
-      history.push("/register");
+      const { ra, name, email, password } = student;
+
+      const response = await api.post("/student", {
+        ra,
+        name,
+        email,
+        password,
+      });
+      console.log(response);
+      history.push("/home");
     } catch (error) {
       console.error(error);
       alert(error.response.data.error);
     }
   };
-  const handleInput = (e) => {
-    setRegister({ ...register, [e.target.id]: e.target.value });
-  };
 
   return (
     <Container>
-      <FormLogin onSubmit={handleSubmit}>
+      <FormRegister onSubmit={handleSubmit}>
         <Header>
           <h1>BEM VINDO AO SENAI OVERFLOW</h1>
           <h2>INFORME OS SEUS DADOS</h2>
@@ -42,7 +64,7 @@ function Login() {
             id="ra"
             label="RA"
             type="text"
-            value={register.ra}
+            value={student.ra}
             handler={handleInput}
             required
           />
@@ -50,7 +72,7 @@ function Login() {
             id="name"
             label="Nome"
             type="text"
-            value={register.name}
+            value={student.name}
             handler={handleInput}
             required
           />
@@ -58,7 +80,7 @@ function Login() {
             id="email"
             label="E-mail"
             type="email"
-            value={register.email}
+            value={student.email}
             handler={handleInput}
             required
           />
@@ -66,7 +88,7 @@ function Login() {
             id="password"
             label="Senha"
             type="password"
-            value={register.password}
+            value={student.password}
             handler={handleInput}
             required
           />
@@ -74,16 +96,20 @@ function Login() {
             id="validPassword"
             label="Confirmar Senha"
             type="password"
-            value={register.validPassword}
+            onBlur={(e) => {
+              if (!validPassword()) alert("As senhas precisam ser iguais");
+              e.target.focus();
+            }}
+            value={student.validPassword}
             handler={handleInput}
             required
           />
-          <Button>Entrar</Button>
+          <Button disabled={buttonDisabled()}>Entrar</Button>
           <Link to="/">Ou se já cadastrado, clique aqui para logar</Link>
         </Body>
-      </FormLogin>
+      </FormRegister>
     </Container>
   );
 }
 
-export default Login;
+export default Register;

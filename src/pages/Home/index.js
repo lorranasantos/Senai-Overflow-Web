@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Container,
   Header,
@@ -12,6 +14,8 @@ import {
 
 import imgProfile from "../../assets/foto_perfil.png";
 import logo from "../../assets/logo.png";
+import api from "../../services/api";
+import { signOut } from "../../services/security";
 
 function Profile() {
   return (
@@ -36,78 +40,72 @@ function Profile() {
   );
 }
 
+function Question({ question }) {
+  return (
+    <QuestionCard>
+      <header>
+        <img src={imgProfile} />
+        <strong>por {question.Student.name}</strong>
+        <p>Em {question.created_at}</p>
+      </header>
+      <section>
+        <strong>{question.title}</strong>
+        <p>{question.description}</p>
+        <img src={question.image} />
+      </section>
+      <footer>
+        <h1>11 Respostas</h1>
+        <section>
+          <header>
+            <img src={imgProfile} />
+            <strong>por Fulano</strong>
+            <p>12/12/2012 às 12:13</p>
+          </header>
+          <p>Resposta para a pergunta</p>
+        </section>
+        <form>
+          <textarea placeholder="Responda essa dúvida" required></textarea>
+          <button>Enviar</button>
+        </form>
+      </footer>
+    </QuestionCard>
+  );
+}
+
 function Home() {
+  const history = useHistory();
+
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    const loadQuestions = async () => {
+      const response = await api.get("/feed");
+      setQuestions(response.data);
+    };
+
+    loadQuestions();
+  }, []);
+
+  const handleSignOut = () => {
+    signOut();
+
+    history.replace("/");
+  };
+
   return (
     <Container>
       <Header>
         <Logo src={logo} />
-        <IconSignOut />
+        <IconSignOut onClick={handleSignOut} />
       </Header>
       <Content>
         <ProfileContainer>
           <Profile />
         </ProfileContainer>
         <FeedContainer>
-          <QuestionCard>
-            <header>
-              <img src={imgProfile} />
-              <strong>por Alcino cino</strong>
-              <p>Em 12/12/2012 às 12:12</p>
-            </header>
-            <section>
-              <strong>Título</strong>
-              <p>Descrição</p>
-              <img src="https://cdn.auth0.com/blog/illustrations/reactjs.png" />
-            </section>
-            <footer>
-              <h1>11 Respostas</h1>
-              <section>
-                <header>
-                  <img src={imgProfile} />
-                  <strong>por Fulano</strong>
-                  <p>12/12/2012 às 12:13</p>
-                </header>
-                <p>Resposta para a pergunta</p>
-              </section>
-              <form>
-                <textarea
-                  placeholder="Responda essa dúvida"
-                  required
-                ></textarea>
-                <button>Enviar</button>
-              </form>
-            </footer>
-          </QuestionCard>
-          <QuestionCard>
-            <header>
-              <img src={imgProfile} />
-              <strong>por Alcino cino</strong>
-              <p>Em 12/12/2012 às 12:12</p>
-            </header>
-            <section>
-              <strong>Título</strong>
-              <p>Descrição</p>
-              <img src="https://cdn.auth0.com/blog/illustrations/reactjs.png" />
-            </section>
-            <footer>
-              <h1>11 Respostas</h1>
-              <section>
-                <header>
-                  <img src={imgProfile} />
-                  <strong>por Fulano</strong>
-                  <p>12/12/2012 às 12:13</p>
-                </header>
-                <p>Resposta para a pergunta</p>
-              </section>
-              <form>
-                <textarea
-                  placeholder="Responda essa dúvida"
-                  required
-                ></textarea>
-                <button>Enviar</button>
-              </form>
-            </footer>
-          </QuestionCard>
+          {questions.map((q) => (
+            <Question question={q} />
+          ))}
         </FeedContainer>
         <ActionContainer>
           <button>Fazer uma Pergunta</button>

@@ -42,7 +42,7 @@ const loginAnimation = keyframes`
   }
 `;
 
-export const FormLogin = styled.form`
+export const FormRegister = styled.form`
   animation: ${loginAnimation} 0.5s;
 
   width: 30%;

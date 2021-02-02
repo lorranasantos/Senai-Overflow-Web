@@ -2,6 +2,7 @@ import { Container, FormLogin, Header, Body, Button } from "./style";
 import Input from "../../components/input";
 import { Link, useHistory } from "react-router-dom";
 import { useState } from "react";
+import api from "../../services/api";
 
 function Login() {
   const history = useHistory();
