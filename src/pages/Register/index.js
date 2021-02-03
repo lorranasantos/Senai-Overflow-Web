@@ -31,14 +31,14 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefalt();
+    e.preventDefault();
 
     if (!validPassword()) return alert("As senhas precisam ser iguais");
 
     try {
       const { ra, name, email, password } = student;
 
-      const response = await api.post("/student", {
+      const response = await api.post("/students", {
         ra,
         name,
         email,

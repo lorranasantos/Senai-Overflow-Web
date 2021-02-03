@@ -15,7 +15,7 @@ import {
 import imgProfile from "../../assets/foto_perfil.png";
 import logo from "../../assets/logo.png";
 import api from "../../services/api";
-import { signOut } from "../../services/security";
+import { signOut, getUser } from "../../services/security";
 
 function Profile() {
   return (
@@ -41,6 +41,43 @@ function Profile() {
 }
 
 function Question({ question }) {
+  const [showAnswers, SetShowAnswers] = useState(false);
+
+  const [newAnswer, setNewAnswer] = useState("");
+
+  const [answers, setAnswers] = useState(question.Answers);
+
+  const qtdAnswers = answers.length;
+
+  const handleAddAnswer = async (e) => {
+    e.preventDefault();
+
+    if (newAnswer.length < 10)
+      return (alert = "A Resposta deve conter no mínimo 10 caracteres");
+    try {
+      const response = await api.post(`/questions/${question.id}/answers`, {
+        description: newAnswer,
+      });
+
+      const aluno = getUser();
+
+      const answerAdded = {
+        id: response.data.id,
+        description: newAnswer,
+        created_at: response.data.created_at,
+        Student: {
+          id: aluno.studentId,
+          name: aluno.name,
+        },
+      };
+
+      setAnswers([...answers, answerAdded]);
+      setNewAnswer("");
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   return (
     <QuestionCard>
       <header>
@@ -54,17 +91,38 @@ function Question({ question }) {
         <img src={question.image} />
       </section>
       <footer>
-        <h1>11 Respostas</h1>
-        <section>
-          <header>
-            <img src={imgProfile} />
-            <strong>por Fulano</strong>
-            <p>12/12/2012 às 12:13</p>
-          </header>
-          <p>Resposta para a pergunta</p>
-        </section>
-        <form>
-          <textarea placeholder="Responda essa dúvida" required></textarea>
+        <h1 onClick={() => SetShowAnswers(!showAnswers)}>
+          {qtdAnswers === 0 ? (
+            "Seja o primeiro a responder"
+          ) : (
+            <>
+              {qtdAnswers} {qtdAnswers > 1 ? "Respostas" : "Resposta"}
+            </>
+          )}
+        </h1>
+        {showAnswers && (
+          <>
+            {answers.map((answer) => (
+              <section>
+                <header>
+                  <img src={imgProfile} />
+                  <strong>por {answer.Student.name}</strong>
+                  <p>{answer.updated_at}</p>
+                </header>
+                <p>{answer.description}</p>
+              </section>
+            ))}
+          </>
+        )}
+
+        <form onSubmit={handleAddAnswer}>
+          <textarea
+            placeholder="Responda essa dúvida"
+            onChange={(e) => setNewAnswer(e.target.value)}
+            required
+          >
+            {newAnswer}
+          </textarea>
           <button>Enviar</button>
         </form>
       </footer>
@@ -74,6 +132,16 @@ function Question({ question }) {
 
 function Home() {
   const history = useHistory();
+
+  // const [answers, setAnswers] = useState([]);
+  // useEffect(() => {
+  //   const loadAnswers = async () => {
+  //     const response = await api.get("/feed");
+  //     setAnswers(response.data);
+  //   };
+
+  //   loadAnswers();
+  // }, []);
 
   const [questions, setQuestions] = useState([]);
 
