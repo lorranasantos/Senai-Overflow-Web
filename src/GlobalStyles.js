@@ -74,13 +74,14 @@ export const GlobalStyles = createGlobalStyle`
             transform: scale(0.95);
         }
     }
-    textarea{
-        font-size: 10px;
+    textarea, select{
+        font-size: 16px;
         padding: 5px;
-        font-weight: bold;
-
+        border-radius: 4px;
+        
         resize:none;
 
+        font-family:sans-serif;
     }
 
 `;

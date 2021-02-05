@@ -28,7 +28,7 @@ export const Container = styled.div`
   }
 
   > input,
-  > label {
+  label {
     width: 100%;
     height: 30px;
     font-size: 16px;
