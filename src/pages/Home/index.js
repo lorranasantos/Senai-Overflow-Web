@@ -22,6 +22,7 @@ import Modal from "../../components/Modal";
 import { FormNewQuestion } from "../../components/Modal/styles";
 import Select from "../../components/selects";
 import Tag from "../../components/tag";
+import Loading from "../../components/Loading";
 
 function Profile() {
   const student = getUser();
@@ -68,7 +69,7 @@ function Answer({ answer }) {
   );
 }
 
-function Question({ question }) {
+function Question({ question, setIsLoading }) {
   const [showAnswers, SetShowAnswers] = useState(false);
 
   const [newAnswer, setNewAnswer] = useState("");
@@ -86,6 +87,7 @@ function Question({ question }) {
 
     if (newAnswer.length < 10)
       return alert("A Resposta deve conter no mínimo 10 caracteres");
+    setIsLoading(true);
     try {
       const response = await api.post(`/questions/${question.id}/answers`, {
         description: newAnswer,
@@ -105,8 +107,10 @@ function Question({ question }) {
 
       setAnswers([...answers, answerAdded]);
       setNewAnswer("");
+      setIsLoading(false);
     } catch (error) {
       alert(error);
+      setIsLoading(false);
     }
   };
 
@@ -163,7 +167,7 @@ function Question({ question }) {
   );
 }
 
-function NewQuestion({ handleReload }) {
+function NewQuestion({ handleReload /* setIsLoading*/ }) {
   const [newQuestion, setNewQuestion] = useState({
     title: "",
     description: "",
@@ -179,14 +183,15 @@ function NewQuestion({ handleReload }) {
 
   const categoriesRef = useRef();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const loadCategories = async () => {
-      try {
-        const response = await api.get("/categories");
-        setCategories(response.data);
-      } catch (error) {
-        alert(error);
-      }
+      setIsLoading(true);
+
+      const response = await api.get("/categories");
+      setCategories(response.data);
+      setIsLoading(false);
     };
     loadCategories();
   }, []);
@@ -242,6 +247,8 @@ function NewQuestion({ handleReload }) {
     if (image) data.append("image", image);
     if (newQuestion.gist) data.append("gist", newQuestion.gist);
 
+    setIsLoading(true);
+
     try {
       await api.post("/questions", data, {
         headers: {
@@ -251,46 +258,50 @@ function NewQuestion({ handleReload }) {
       handleReload();
     } catch (error) {
       alert(error);
+      setIsLoading(false);
     }
   };
   return (
-    <FormNewQuestion onSubmit={handleAddNewQuestion}>
-      <Input
-        id="title"
-        label="Título"
-        value={newQuestion.title}
-        handler={handleInput}
-        required
-      />
-      <Input
-        id="description"
-        label="Descrição"
-        value={newQuestion.description}
-        handler={handleInput}
-        required
-      />
-      <Input
-        id="gist"
-        label="Gist"
-        value={newQuestion.gist}
-        handler={handleInput}
-      />
-      <Select
-        id="categories"
-        label="Categorias"
-        handler={handleCategories}
-        ref={categoriesRef}
-      >
-        <option value="" selected disabled>
-          Selecione
-        </option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.description}
+    <>
+      {isLoading && <Loading />}
+      <FormNewQuestion onSubmit={handleAddNewQuestion}>
+        <Input
+          id="title"
+          label="Título"
+          value={newQuestion.title}
+          handler={handleInput}
+          required
+        />
+        <Input
+          id="description"
+          label="Descrição"
+          value={newQuestion.description}
+          handler={handleInput}
+          required
+        />
+        <Input
+          id="gist"
+          label="Gist"
+          value={newQuestion.gist}
+          handler={handleInput}
+        />
+        <Select
+          id="categories"
+          label="Categorias"
+          handler={handleCategories}
+          ref={categoriesRef}
+        >
+          <option value="" selected disabled>
+            Selecione
           </option>
-        ))}
-        <div>
           {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.description}
+            </option>
+          ))}
+        </Select>
+        <div>
+          {categoriesSel.map((c) => (
             <Tag
               key={c.id}
               info={c.description}
@@ -298,11 +309,11 @@ function NewQuestion({ handleReload }) {
             ></Tag>
           ))}
         </div>
-      </Select>
-      <input type="file" onChange={handleImage} />
-      <img alt="Pré-visualização" ref={imageRef} />
-      <button>Enviar</button>
-    </FormNewQuestion>
+        <input type="file" onChange={handleImage} />
+        <img alt="Pré-visualização" ref={imageRef} />
+        <button>Enviar</button>
+      </FormNewQuestion>
+    </>
   );
 }
 
@@ -314,6 +325,8 @@ function Home() {
   const [reload, setReload] = useState(null);
 
   const [showNewQuestion, setShowNewQuestion] = useState();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -342,7 +355,10 @@ function Home() {
           title="Faça uma pergunta"
           handleClose={() => setShowNewQuestion(false)}
         >
-          <NewQuestion handleReload={handleReload} />
+          <NewQuestion
+            handleReload={handleReload}
+            setIsLoading={setIsLoading}
+          />
         </Modal>
       )}
       <Container>
@@ -356,7 +372,7 @@ function Home() {
           </ProfileContainer>
           <FeedContainer>
             {questions.map((q) => (
-              <Question question={q} />
+              <Question question={q} setIsLoading={setIsLoading} />
             ))}
           </FeedContainer>
           <ActionContainer>
