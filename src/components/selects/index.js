@@ -6,7 +6,7 @@ const Select = forwardRef(
     return (
       <Container>
         <label htmlFor={id}>{label}</label>
-        <select id={id} value={value} onChange={handler} {...rest}>
+        <select id={id} value={value} onChange={handler} {...rest} ref={ref}>
           {children}
         </select>
       </Container>

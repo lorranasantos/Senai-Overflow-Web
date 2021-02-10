@@ -17,21 +17,53 @@ import Input from "../../components/input";
 import imgProfile from "../../assets/foto_perfil.png";
 import logo from "../../assets/logo.png";
 import api from "../../services/api";
-import { signOut, getUser } from "../../services/security";
+import { signOut, getUser, setUser } from "../../services/security";
 import Modal from "../../components/Modal";
 import { FormNewQuestion } from "../../components/Modal/styles";
 import Select from "../../components/selects";
 import Tag from "../../components/tag";
 import Loading from "../../components/Loading";
+import { validSquaredImage } from "../../utils";
 
-function Profile() {
-  const student = getUser();
+function Profile({ setIsLoading, handleReload, setMessage }) {
+  const [student, setStudent] = useState(getUser());
+
+  // useEffect(() => {
+  //   setStudent(getUser());
+  // }, []);
+
+  const handleImage = async (e) => {
+    if (!e.target.files[0]) return;
+
+    try {
+      await validSquaredImage(e.target.files[0]);
+
+      const data = new FormData();
+
+      data.append("image", e.target.files[0]);
+
+      setIsLoading(true);
+
+      const response = await api.post(`/students/${student.id}/images`, data);
+
+      setTimeout(() => {
+        setStudent({ ...student, image: response.data.image });
+        handleReload();
+      }, 1000);
+
+      setUser({ ...student, image: response.data.image });
+    } catch (error) {
+      alert(error);
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
       <section>
-        <img src={imgProfile} alt="imagem de Perfil" />
-        <a href="a">Editar Foto</a>
+        <img src={student.image || imgProfile} alt="imagem de Perfil" />
+        <label htmlFor="editImageProfile">Editar Foto</label>
+        <input id="editImageProfile" type="file" onChange={handleImage} />
       </section>
       <section>
         <strong>NOME:</strong>
@@ -55,7 +87,7 @@ function Answer({ answer }) {
   return (
     <section>
       <header>
-        <img src={imgProfile} alt="imagem de Perfil" />
+        <img src={answer.Student.image || imgProfile} alt="imagem de Perfil" />
         <strong>
           Por{" "}
           {student.studentId === answer.Student.id
@@ -74,7 +106,7 @@ function Question({ question, setIsLoading }) {
 
   const [newAnswer, setNewAnswer] = useState("");
 
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(question.Answers);
 
   const qtdAnswers = answers.length;
 
@@ -98,10 +130,11 @@ function Question({ question, setIsLoading }) {
       const answerAdded = {
         id: response.data.id,
         description: newAnswer,
-        created_at: response.data.created_at,
+        created_at: response.data.createdAt,
         Student: {
           id: aluno.studentId,
           name: aluno.name,
+          image: aluno.image,
         },
       };
 
@@ -119,7 +152,10 @@ function Question({ question, setIsLoading }) {
   return (
     <QuestionCard>
       <header>
-        <img src={imgProfile} alt="imagem de Perfil" />
+        <img
+          src={question.Student.image || imgProfile}
+          alt="imagem de Perfil"
+        />
         <strong>
           Por{" "}
           {student.studentId === question.Student.id
@@ -167,7 +203,7 @@ function Question({ question, setIsLoading }) {
   );
 }
 
-function NewQuestion({ handleReload /* setIsLoading*/ }) {
+function NewQuestion({ handleReload, setIsLoading }) {
   const [newQuestion, setNewQuestion] = useState({
     title: "",
     description: "",
@@ -182,8 +218,6 @@ function NewQuestion({ handleReload /* setIsLoading*/ }) {
   const imageRef = useRef();
 
   const categoriesRef = useRef();
-
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -205,12 +239,13 @@ function NewQuestion({ handleReload /* setIsLoading*/ }) {
       setCategoriesSel([...categoriesSel, categorySel]);
     }
     e.target[e.target.selectedIndex].disabled = true;
+    e.target.value = "";
   };
 
   const handleImage = (e) => {
     if (e.target.files[0]) {
       imageRef.current.src = URL.createObjectURL(e.target.files[0]);
-      imageRef.current.style.display = "file";
+      imageRef.current.style.display = "flex";
     } else {
       imageRef.current.src = "";
       imageRef.current.style.display = "none";
@@ -263,7 +298,6 @@ function NewQuestion({ handleReload /* setIsLoading*/ }) {
   };
   return (
     <>
-      {isLoading && <Loading />}
       <FormNewQuestion onSubmit={handleAddNewQuestion}>
         <Input
           id="title"
@@ -330,10 +364,12 @@ function Home() {
 
   useEffect(() => {
     const loadQuestions = async () => {
+      setIsLoading(true);
       const response = await api.get("/feed");
       setQuestions(response.data);
-    };
 
+      setIsLoading(false);
+    };
     loadQuestions();
   }, [reload]);
 
@@ -350,6 +386,7 @@ function Home() {
 
   return (
     <>
+      {isLoading && <Loading />}
       {showNewQuestion && (
         <Modal
           title="Faça uma pergunta"
@@ -368,7 +405,7 @@ function Home() {
         </Header>
         <Content>
           <ProfileContainer>
-            <Profile />
+            <Profile handleReload={handleReload} setIsLoading={setIsLoading} />
           </ProfileContainer>
           <FeedContainer>
             {questions.map((q) => (
