@@ -11,6 +11,9 @@ import {
   ActionContainer,
   QuestionCard,
   IconSignOut,
+  Gisticon,
+  ContainerGist,
+  Search,
 } from "./styles";
 
 import Input from "../../components/input";
@@ -24,6 +27,7 @@ import Select from "../../components/selects";
 import Tag from "../../components/tag";
 import Loading from "../../components/Loading";
 import { validSquaredImage } from "../../utils";
+import ReactEmbedGist from "react-embed-gist";
 
 function Profile({ setIsLoading, handleReload, setMessage }) {
   const [student, setStudent] = useState(getUser());
@@ -101,7 +105,7 @@ function Answer({ answer }) {
   );
 }
 
-function Question({ question, setIsLoading }) {
+function Question({ question, setIsLoading, setCurrentGist }) {
   const [showAnswers, SetShowAnswers] = useState(false);
 
   const [newAnswer, setNewAnswer] = useState("");
@@ -165,6 +169,9 @@ function Question({ question, setIsLoading }) {
         <p>
           Em {format(new Date(question.created_at), "dd/MM/yyyy 'às' HH:mm")}
         </p>
+        {question.gist && (
+          <Gisticon onClick={() => setCurrentGist(question.gist)} />
+        )}
       </header>
       <section>
         <strong>{question.title}</strong>
@@ -350,6 +357,24 @@ function NewQuestion({ handleReload, setIsLoading }) {
     </>
   );
 }
+function Gist({ gist, handleClose }) {
+  if (gist) {
+    const formatGist = gist.split(".com/").pop();
+
+    return (
+      <Modal
+        title="Exemplo de código"
+        handleClose={() => handleClose(undefined)}
+      >
+        <ContainerGist>
+          <ReactEmbedGist gist={formatGist} />
+        </ContainerGist>
+      </Modal>
+    );
+  } else {
+    return null;
+  }
+}
 
 function Home() {
   const history = useHistory();
@@ -362,11 +387,17 @@ function Home() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [currentGist, setCurrentGist] = useState(undefined);
+
+  const [newSearch, setNewSearch] = useState({});
+
   useEffect(() => {
     const loadQuestions = async () => {
       setIsLoading(true);
       const response = await api.get("/feed");
       setQuestions(response.data);
+
+      window.scrollTo(5, 5);
 
       setIsLoading(false);
     };
@@ -384,9 +415,15 @@ function Home() {
     setReload(Math.random());
   };
 
+  const handleAddSearch = (e) => {
+    try {
+    } catch (error) {}
+  };
+
   return (
     <>
       {isLoading && <Loading />}
+      <Gist gist={currentGist} handleClose={setCurrentGist} />
       {showNewQuestion && (
         <Modal
           title="Faça uma pergunta"
@@ -401,6 +438,17 @@ function Home() {
       <Container>
         <Header>
           <Logo src={logo} onClick={handleReload} />
+          {/* <Search>
+            <form onSubmit={handleAddSearch}>
+              <textarea
+                placeholder="O que você procura?"
+                onChange={(e) => setNewSearch(e.target.value)}
+                required
+                value={newSearch}
+              ></textarea>
+              <button>Enviar</button>
+            </form>
+          </Search> */}
           <IconSignOut onClick={handleSignOut} />
         </Header>
         <Content>
@@ -409,7 +457,11 @@ function Home() {
           </ProfileContainer>
           <FeedContainer>
             {questions.map((q) => (
-              <Question question={q} setIsLoading={setIsLoading} />
+              <Question
+                question={q}
+                setIsLoading={setIsLoading}
+                setCurrentGist={setCurrentGist}
+              />
             ))}
           </FeedContainer>
           <ActionContainer>
