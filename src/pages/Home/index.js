@@ -397,8 +397,6 @@ function Home() {
       const response = await api.get("/feed");
       setQuestions(response.data);
 
-      window.scrollTo(5, 5);
-
       setIsLoading(false);
     };
     loadQuestions();
